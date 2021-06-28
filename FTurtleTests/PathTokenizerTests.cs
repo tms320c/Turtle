@@ -27,7 +27,7 @@ namespace FTurtleTests
             var tokenizer = new PathTokenizerDefault();
 
             var tokens = tokenizer.Parse(path);
-            Assert.Equal(path.Length, tokens.Count());
+            Assert.True(path.Length >= tokens.Count()); // may cut L and R at the tail
 
             var enumerable = tokens as char[] ?? tokens.ToArray();
 

@@ -21,10 +21,10 @@ namespace FTurtleTests
         [Fact]
         public void ArrowHeadingsAreProper()
         {
-            Assert.Equal((-1, 0), Arrow.North);
-            Assert.Equal((0, 1), Arrow.East);
-            Assert.Equal((1, 0), Arrow.South);
-            Assert.Equal((0, -1), Arrow.West);
+            Assert.Equal((-1, 0), Heading.North);
+            Assert.Equal((0, 1), Heading.East);
+            Assert.Equal((1, 0), Heading.South);
+            Assert.Equal((0, -1), Heading.West);
         }
 
         [Theory]
@@ -63,34 +63,34 @@ namespace FTurtleTests
 
         public static IEnumerable<object[]> TestData()
         {
-            yield return new object[] { Arrow.North, Arrow.North };
-            yield return new object[] { Arrow.East, Arrow.East };
-            yield return new object[] { Arrow.South, Arrow.South };
-            yield return new object[] { Arrow.West, Arrow.West };
+            yield return new object[] { Heading.North, Heading.North };
+            yield return new object[] { Heading.East, Heading.East };
+            yield return new object[] { Heading.South, Heading.South };
+            yield return new object[] { Heading.West, Heading.West };
         }
 
         public static IEnumerable<object[]> TestData2()
         {
-            yield return new object[] { Arrow.North, Arrow.North.Item1, Arrow.North.Item2 };
-            yield return new object[] { Arrow.East, Arrow.East.Item1, Arrow.East.Item2 };
-            yield return new object[] { Arrow.South, Arrow.South.Item1, Arrow.South.Item2 };
-            yield return new object[] { Arrow.West, Arrow.West.Item1, Arrow.West.Item2 };
+            yield return new object[] { Heading.North, Heading.North.Item1, Heading.North.Item2 };
+            yield return new object[] { Heading.East, Heading.East.Item1, Heading.East.Item2 };
+            yield return new object[] { Heading.South, Heading.South.Item1, Heading.South.Item2 };
+            yield return new object[] { Heading.West, Heading.West.Item1, Heading.West.Item2 };
         }
 
         public static IEnumerable<object[]> TestDataRotateRight()
         {
-            yield return new object[] { Arrow.East, Arrow.North };
-            yield return new object[] { Arrow.South, Arrow.East };
-            yield return new object[] { Arrow.West, Arrow.South };
-            yield return new object[] { Arrow.North, Arrow.West };
+            yield return new object[] { Heading.East, Heading.North };
+            yield return new object[] { Heading.South, Heading.East };
+            yield return new object[] { Heading.West, Heading.South };
+            yield return new object[] { Heading.North, Heading.West };
         }
 
         public static IEnumerable<object[]> TestDataRotateLeft()
         {
-            yield return new object[] { Arrow.West, Arrow.North };
-            yield return new object[] { Arrow.North, Arrow.East };
-            yield return new object[] { Arrow.East, Arrow.South };
-            yield return new object[] { Arrow.South, Arrow.West };
+            yield return new object[] { Heading.West, Heading.North };
+            yield return new object[] { Heading.North, Heading.East };
+            yield return new object[] { Heading.East, Heading.South };
+            yield return new object[] { Heading.South, Heading.West };
         }
 
     }

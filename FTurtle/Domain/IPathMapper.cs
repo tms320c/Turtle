@@ -4,6 +4,7 @@ namespace FTurtle.Domain
 {
     public interface IPathMapper
     {
-        IList<Arrow> MapRelative(string path, IPathTokenizer tokenizer);
+        IList<IArrow> MapRelative(string path, IPathTokenizer tokenizer);
+        IEnumerable<Position> MapAbsolute(IEnumerable<IArrow> moves, Position initialPosition);
     }
 }

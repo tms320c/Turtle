@@ -53,12 +53,52 @@ namespace FTurtleTests
             Assert.Equal(0, movements.Count);
         }
 
+        [Fact]
+        public void TestPathMapperAbsolute()
+        {
+            var path = "MMLMMLMRMLLM";
+            var start = new Position { X = 0, Y = 0, Heading = Arrow.Create(Heading.South) };
+
+            var movements = _sot.MapRelative(path, _tokenizer);
+            var trace = _sot.MapAbsolute(movements, start).ToArray();
+            Assert.Equal(path.Count(c => c == 'M') + 1, trace.Length); // +1 for initialPosition
+
+            // Initial position
+            Assert.Equal(0, trace[0].X);
+            Assert.Equal(0, trace[0].Y);
+
+            // two steps to South
+            Assert.Equal(1, trace[1].X);
+            Assert.Equal(0, trace[1].Y);
+            Assert.Equal(2, trace[2].X);
+            Assert.Equal(0, trace[2].Y);
+
+            // two steps to East
+            Assert.Equal(2, trace[3].X);
+            Assert.Equal(1, trace[3].Y);
+            Assert.Equal(2, trace[4].X);
+            Assert.Equal(2, trace[4].Y);
+
+            // one step to North
+            Assert.Equal(1, trace[5].X);
+            Assert.Equal(2, trace[5].Y);
+
+            // one step to East
+            Assert.Equal(1, trace[6].X);
+            Assert.Equal(3, trace[6].Y);
+
+            // one step to West
+            Assert.Equal(1, trace[7].X);
+            Assert.Equal(2, trace[7].Y);
+        }
+
         public static IEnumerable<object[]> TestDataSimple()
         {
-            yield return new object[] { Arrow.North, "MMMMMM" };
-            yield return new object[] { Arrow.East, "MRMMLRLR" };
-            yield return new object[] { Arrow.South, "LMMLM" };
-            yield return new object[] { Arrow.West, "MRMRMMRMM" };
+            yield return new object[] { Heading.North, "MMMMMM" };
+            yield return new object[] { Heading.East, "MRMMLRLR" };
+            yield return new object[] { Heading.South, "LMMLM" };
+            yield return new object[] { Heading.West, "MRMRMMRMM" };
         }
+
     }
 }
