@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FTurtleTests
+namespace FTurtle.Domain
 {
-    public static class PathGenerator
+    public interface IPathTokenizer
     {
-        private static string[] _validTokens = {"R", "L", "M"};
-
+        public IEnumerable<char> Parse(string path);
     }
 }
