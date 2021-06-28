@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FTurtle.Domain;
-
-namespace FTurtle
+﻿namespace FTurtle.Domain
 {
     public struct Position // it is ValueType for the sake of immutability
     {

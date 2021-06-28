@@ -28,14 +28,14 @@ namespace FTurtleTests
         {
             var path = PathGenerator.Create(20);
             var movements = _sot.MapRelative(path, _tokenizer);
-            Assert.Equal(path.Count(c => c == 'M'), movements.Count); // MapRelative removes all 'R' and 'L' tokens
+            Assert.Equal(path.Count(c => c == 'M'), movements.Count()); // MapRelative removes all 'R' and 'L' tokens
         }
 
         [Theory]
         [MemberData(nameof(TestDataSimple))]
         public void TestPathMapperSimple((int, int) expected, string path)
         {
-            var movements = _sot.MapRelative(path, _tokenizer);
+            var movements = _sot.MapRelative(path, _tokenizer).ToArray();
             var final = movements[^1];
             Assert.Equal(expected, final.Head);
         }
@@ -45,12 +45,12 @@ namespace FTurtleTests
         {
             var path = "";
             var movements = _sot.MapRelative(path, _tokenizer);
-            Assert.Equal(0, movements.Count);
+            Assert.Empty(movements);
 
             // Default tokenizer trims tail rotations
             path = "LLLRRRLRLR";
             movements = _sot.MapRelative(path, _tokenizer);
-            Assert.Equal(0, movements.Count);
+            Assert.Empty(movements);
         }
 
         [Fact]
