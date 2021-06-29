@@ -11,6 +11,6 @@ namespace FTurtle.Domain
         Left = 'L',
         Right = 'R',
         Move = 'M',
-        Skip = 'X'
+        Nop = 'X'
     }
 }

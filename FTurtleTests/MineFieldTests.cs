@@ -22,7 +22,7 @@ namespace FTurtleTests
         }
 
         [Fact]
-        public void TestFieldPlanting()
+        public void ShouldAcceptTheMinesAndFindThem()
         {
             var p1 = new Position
             {

@@ -22,7 +22,7 @@ namespace FTurtleTests
         }
 
         [Fact]
-        public void TestPathTokenizerDefault()
+        public void ShouldParseRandomStringsWithProperSymbols()
         {
             var path = PathGenerator.Create(20);
             _output.WriteLine("Path: " + path);
@@ -39,7 +39,7 @@ namespace FTurtleTests
         }
 
         [Fact]
-        public void TestPathTokenizerDefaultTrimRotationsAtTail()
+        public void ShouldTrimRotationCommandsFromTheStringTail()
         {
             var pathHead = "RLMMMRLM";
             var pathTail = "LRRLLR";
@@ -52,7 +52,7 @@ namespace FTurtleTests
         }
 
         [Fact]
-        public void TestPathTokenizerDefaultInvalidTokens()
+        public void ShouldProcessInvalidTokens()
         {
             var path = "XLMMMRLM";
             _output.WriteLine("Path: " + path);
@@ -64,7 +64,7 @@ namespace FTurtleTests
         }
 
         [Fact]
-        public void TestPathTokenizerDefaultCustomValidator()
+        public void CanAcceptAndInvokeCustomConverter()
         {
             var path = "XLMMMRLM";
             _output.WriteLine("Path: " + path);

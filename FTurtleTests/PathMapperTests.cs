@@ -23,11 +23,13 @@ namespace FTurtleTests
             _output = output;
             _tokenizer = tokenizer;
             _sot = new PathMapper();
-            _sot2 = new RelativeMapper();
+            // internal to FTurtle assembly. Has been made visible to the tests in Directory.build.props
+            // the reason is its algorithm complexity.
+            _sot2 = new RelativeMapper(); 
         }
 
         [Fact]
-        public void TestPathMapperRotationsFiltering()
+        public void InternalPathMapperShouldFilterOutAllRotations()
         {
             var path = PathGenerator.Create(20);
             var movements = _sot2.Map(_tokenizer.Parse(path), Heading.North);
@@ -36,7 +38,7 @@ namespace FTurtleTests
 
         [Theory]
         [MemberData(nameof(TestDataSimple))]
-        public void TestPathMapperSimple((int, int) expected, string path)
+        public void InternalPathMapperCanHandleNonCornerCases((int, int) expected, string path)
         {
             var movements = _sot2.Map(_tokenizer.Parse(path), Heading.North).ToArray();
             var final = movements[^1];
@@ -44,7 +46,7 @@ namespace FTurtleTests
         }
 
         [Fact]
-        public void TestPathMapperCanAcceptEmptyData()
+        public void InternalPathMapperCanAcceptEmptyDataAndMapItToEmptyCollection()
         {
             var path = "";
             var movements = _sot2.Map(_tokenizer.Parse(path), Heading.North);
@@ -57,7 +59,7 @@ namespace FTurtleTests
         }
 
         [Fact]
-        public void TestPathMapperAbsolute()
+        public void ShouldGenerateCorrectCoordinates()
         {
             var path = "MMLMMLMRMLLM";
             var start = new Position { X = 0, Y = 0, Heading = Heading.South };
