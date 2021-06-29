@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FTurtle.Domain;
 
 namespace FTurtle.Application
@@ -8,20 +9,30 @@ namespace FTurtle.Application
     /// </summary>
     public sealed class PathMapper : IPathMapper
     {
-        public PathMapper() { }
+        private readonly IBoard _board;
+
+        /// <summary>
+        /// The board is required because we "map trajectory onto the board"
+        /// </summary>
+        /// <param name="board">Game board</param>
+        public PathMapper(IBoard board)
+        {
+            _board = board ?? throw new ArgumentNullException(nameof(board), "Board is mandatory");
+        }
 
         /// <summary>
         /// Converts commands to the turtle trajectory.
         /// </summary>
         /// <param name="path">Sequence of the movement commands</param>
         /// <param name="initialPosition">coordinates and heading of the turtle's starting position</param>
+        /// <param name="constraintHandler">Verifies and fixes coordinates to handle collisions with the board boundaries. See the interface comments for details.</param>
         /// <returns>Collection of positions. initialPosition is the first element of the collection.</returns>
-        public IEnumerable<Position> Map(IEnumerable<Command> path, Position initialPosition)
+        public IEnumerable<Position> Map(IEnumerable<Command> path, Position initialPosition, Func<Position, IBoard, Position> constraintHandler)
         {
             var position = initialPosition;
             yield return position;
 
-            var pathMapper = new RelativeMapper();
+            var pathMapper = new RelativeMapper(); // just a helper class defined below. Not a real dependency.
 
             // All moves are relative to Heading.North and should be transformed (rotated) to a new
             // coordinate system where initialPosition.Heading is equal to Heading.North
@@ -37,14 +48,54 @@ namespace FTurtle.Application
                     "L" => move.RotateLeft(),
                     _ => move
                 };
-                position = new Position // we avoid mutations, but this is generator state, not the class instance state.
+                var nextPosition = new Position
                 {
                     X = position.X + realMove.X,
                     Y = position.Y + realMove.Y,
-                    Heading = realMove.Head
+                    Heading = realMove.Head // not really necessary here. Just a bookkeeping. It may be returned by constraintHandler
                 };
+
+                // we avoid mutations, but position is generator state, not the class instance state.
+                position = constraintHandler?.Invoke(nextPosition, _board) ?? nextPosition;
+
+                rotation = constraintHandler == null ? rotation : MayBeAdjustRotation(rotation, position);
+
                 yield return position;
             }
+        }
+
+        /// <summary>
+        /// Collision handler may request a rotation. The convention is:
+        ///  Request is transmitted using position.Heading field and encoded as:
+        ///   Heading.North or Heading.Void - keep the current rotation
+        ///   Heading.East - add one rotation to right
+        ///   Heading.South - add two rotations to right (turn around)
+        ///   Heading.West - add one rotation to left
+        /// </summary>
+        /// <param name="currentRotation">current coordinates rotation</param>
+        /// <param name="position">Position received from the collision handler</param>
+        /// <returns></returns>
+        private string MayBeAdjustRotation(string currentRotation, Position position)
+        {
+            if (position.Heading == Heading.Void || position.Heading == Heading.North) // correction is not required
+            {
+                return currentRotation;
+            }
+
+            return currentRotation switch
+            {
+                "0" => GetRotationCorrection(position.Heading), // the currentRotation rotation was identity (heading to North)
+                "R" => position.Heading == Heading.East
+                    ? "2R" 
+                    : (position.Heading == Heading.South ? "L" : "0"),
+                "2R" => position.Heading == Heading.East
+                    ? "L"
+                    : (position.Heading == Heading.South ? "0" : "R"),
+                "L" => position.Heading == Heading.East
+                    ? "0"
+                    : (position.Heading == Heading.South ? "R" : "2R"),
+                _ => currentRotation // whatever. to make compiler happy
+            };
         }
 
         /// <summary>

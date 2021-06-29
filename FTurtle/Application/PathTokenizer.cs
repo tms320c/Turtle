@@ -7,7 +7,7 @@ namespace FTurtle.Application
     /// <summary>
     /// Simple implementation of the path description tokenizer.
     /// </summary>
-    public class PathTokenizerDefault : IPathTokenizer
+    public class PathTokenizer : IPathTokenizer
     {
         public IEnumerable<Command> Parse(string path, Func<char, Command> converter = null)
         {

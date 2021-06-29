@@ -10,12 +10,12 @@ using Xunit.Sdk;
 
 namespace FTurtleTests
 {
-    public class PathTokenizerTests : IClassFixture<PathTokenizerDefault>
+    public class PathTokenizerTests : IClassFixture<PathTokenizer>
     {
         private readonly ITestOutputHelper _output;
         private readonly IPathTokenizer _defaultTokenizer;
 
-        public PathTokenizerTests(ITestOutputHelper output, PathTokenizerDefault defaultTokenizer)
+        public PathTokenizerTests(ITestOutputHelper output, PathTokenizer defaultTokenizer)
         {
             _output = output;
             _defaultTokenizer = defaultTokenizer;

@@ -10,5 +10,6 @@
         public static readonly (int, int) West = (0, -1);
         public static readonly (int, int) South = (1, 0);
         public static readonly (int, int) East = (0, 1);
+        public static readonly (int, int) Void = (0, 0);
     }
 }
