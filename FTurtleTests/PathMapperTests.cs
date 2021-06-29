@@ -65,33 +65,28 @@ namespace FTurtleTests
             var trace = _sot.Map(_tokenizer.Parse(path), start).ToArray();
             Assert.Equal(path.Count(c => c == (char)Command.Move) + 1, trace.Length); // +1 for initialPosition
 
-            // Initial position
-            Assert.Equal(0, trace[0].X);
-            Assert.Equal(0, trace[0].Y);
+            var expected = new (int, int)[]
+            {
+                // Initial position
+                (start.X, start.Y),
+                // two steps to South (initial Heading is South)
+                (1, 0), 
+                (2, 0), 
+                // two steps to East
+                (2, 1), 
+                (2, 2), 
+                // one step to North
+                (1, 2), 
+                // one step to East
+                (1, 3),
+                // one step to West
+                (1, 2)
+            };
 
-            // two steps to South
-            Assert.Equal(1, trace[1].X);
-            Assert.Equal(0, trace[1].Y);
-            Assert.Equal(2, trace[2].X);
-            Assert.Equal(0, trace[2].Y);
-
-            // two steps to East
-            Assert.Equal(2, trace[3].X);
-            Assert.Equal(1, trace[3].Y);
-            Assert.Equal(2, trace[4].X);
-            Assert.Equal(2, trace[4].Y);
-
-            // one step to North
-            Assert.Equal(1, trace[5].X);
-            Assert.Equal(2, trace[5].Y);
-
-            // one step to East
-            Assert.Equal(1, trace[6].X);
-            Assert.Equal(3, trace[6].Y);
-
-            // one step to West
-            Assert.Equal(1, trace[7].X);
-            Assert.Equal(2, trace[7].Y);
+            for (var i = 0; i < expected.Length; ++i)
+            {
+                Assert.Equal(expected[i], (trace[i].X, trace[i].Y));
+            }
         }
 
         public static IEnumerable<object[]> TestDataSimple()
