@@ -58,6 +58,37 @@ namespace FTurtleTests
         }
 
         [Fact]
+        public void ShouldAddMineAtPosition()
+        {
+            var x = 17;
+            var y = 42;
+            var width = 50;
+            var height = 20;
+
+            var board = new Board(width, height, _mines);
+
+            board.AddMine(new Position { X = x, Y = y });
+
+            for (var i = 0; i < height; ++i)
+            {
+                for (var j = 0; j < width; ++j)
+                {
+                    if (i == x && j == y)
+                    {
+                        Assert.True(board.HasMine(i, j));
+                    }
+                    else
+                    {
+                        Assert.False(board.HasMine(i, j));
+                    }
+                }
+            }
+
+            board.AddMine(0, 0);
+            Assert.True(board.HasMine(0, 0));
+        }
+
+        [Fact]
         public void ShouldThrowExceptionIfPositionIsOutside()
         {
             var x = 17;
@@ -69,18 +100,23 @@ namespace FTurtleTests
             var board = new Board(width, height, _mines);
 
             var ex = Assert.Throws<ArgumentException>(() => board.HasMine(x, y));
+            ex = Assert.Throws<ArgumentException>(() => board.AddMine(x, y));
             _output.WriteLine(ex.Message);
 
             ex = Assert.Throws<ArgumentException>(() => board.HasMine(-1, 0));
+            ex = Assert.Throws<ArgumentException>(() => board.AddMine(-1, 0));
             _output.WriteLine(ex.Message);
 
             ex = Assert.Throws<ArgumentException>(() => board.HasMine(0, -1));
+            ex = Assert.Throws<ArgumentException>(() => board.AddMine(0, -1));
             _output.WriteLine(ex.Message);
 
             ex = Assert.Throws<ArgumentException>(() => board.HasMine(9, height));
+            ex = Assert.Throws<ArgumentException>(() => board.AddMine(9, height));
             _output.WriteLine(ex.Message);
             
             ex = Assert.Throws<ArgumentException>(() => board.HasMine(width, 0));
+            ex = Assert.Throws<ArgumentException>(() => board.AddMine(width, 0));
             _output.WriteLine(ex.Message);
         }
     }

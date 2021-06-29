@@ -12,5 +12,7 @@ namespace FTurtle.Domain
         public int Height { get; } // X span
         bool HasMine(Position position);
         bool HasMine(int x, int y);
+        void AddMine(Position position);
+        void AddMine(int x, int y);
     }
 }

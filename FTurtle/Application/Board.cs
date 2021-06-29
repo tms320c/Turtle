@@ -34,16 +34,32 @@ namespace FTurtle.Application
 
         public bool HasMine(Position position)
         {
-            if (position.X < 0 || position.X > Height - 1 || position.Y < 0 || position.Y > Width - 1)
-            {
-                throw new ArgumentException($"Position ({position.X}, {position.Y}) is outside of the board");
-            }
+            ValidatePosition(position);
             return _mineField.HasMine(position);
         }
 
         public bool HasMine(int x, int y)
         {
             return HasMine(new Position {X = x, Y = y});
+        }
+
+        public void AddMine(Position position)
+        {
+            ValidatePosition(position);
+            _mineField.SetMine(position);
+        }
+
+        public void AddMine(int x, int y)
+        {
+            AddMine(new Position { X = x, Y = y });
+        }
+
+        private void ValidatePosition(Position position)
+        {
+            if (position.X < 0 || position.X > Height - 1 || position.Y < 0 || position.Y > Width - 1)
+            {
+                throw new ArgumentException($"Position ({position.X}, {position.Y}) is outside of the board");
+            }
         }
     }
 }
