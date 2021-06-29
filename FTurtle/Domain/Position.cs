@@ -4,6 +4,6 @@
     {
         public int X { get; init; }
         public int Y { get; init; }
-        public IArrow Heading { get; init; }
+        public (int, int) Heading { get; init; }
     }
 }

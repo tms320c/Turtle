@@ -1,4 +1,5 @@
 ﻿using System;
+using FTurtle.Application;
 using FTurtle.Domain;
 
 namespace FTurtle
@@ -8,7 +9,6 @@ namespace FTurtle
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            var p = new Position {X = 0, Y = 0, Heading = Arrow.Create(Heading.North)};
         }
     }
 }

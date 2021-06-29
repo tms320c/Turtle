@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace FTurtle.Domain
 {
-    public interface IPathTokenizer
+    public enum Command
     {
-        public IEnumerable<Command> Parse(string path, Func<char, Command> validator = null);
+        Left = 'L',
+        Right = 'R',
+        Move = 'M',
+        Skip = 'X'
     }
 }

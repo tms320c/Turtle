@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FTurtle;
+using FTurtle.Application;
 using FTurtle.Domain;
 using FTurtleTests.Tools;
 using Xunit;
@@ -14,6 +15,7 @@ namespace FTurtleTests
     {
         private readonly ITestOutputHelper _output;
         private readonly IPathMapper _sot;
+        private readonly RelativeMapper _sot2;
         private readonly IPathTokenizer _tokenizer;
 
         public PathMapperTests(ITestOutputHelper output, PathTokenizerDefault tokenizer)
@@ -21,21 +23,22 @@ namespace FTurtleTests
             _output = output;
             _tokenizer = tokenizer;
             _sot = new PathMapper();
+            _sot2 = new RelativeMapper();
         }
 
         [Fact]
         public void TestPathMapperRotationsFiltering()
         {
             var path = PathGenerator.Create(20);
-            var movements = _sot.MapRelative(path, _tokenizer);
-            Assert.Equal(path.Count(c => c == 'M'), movements.Count()); // MapRelative removes all 'R' and 'L' tokens
+            var movements = _sot2.Map(_tokenizer.Parse(path), Heading.North);
+            Assert.Equal(path.Count(c => c == (char)Command.Move), movements.Count()); // MapRelative removes all 'R' and 'L' tokens
         }
 
         [Theory]
         [MemberData(nameof(TestDataSimple))]
         public void TestPathMapperSimple((int, int) expected, string path)
         {
-            var movements = _sot.MapRelative(path, _tokenizer).ToArray();
+            var movements = _sot2.Map(_tokenizer.Parse(path), Heading.North).ToArray();
             var final = movements[^1];
             Assert.Equal(expected, final.Head);
         }
@@ -44,12 +47,12 @@ namespace FTurtleTests
         public void TestPathMapperCanAcceptEmptyData()
         {
             var path = "";
-            var movements = _sot.MapRelative(path, _tokenizer);
+            var movements = _sot2.Map(_tokenizer.Parse(path), Heading.North);
             Assert.Empty(movements);
 
             // Default tokenizer trims tail rotations
             path = "LLLRRRLRLR";
-            movements = _sot.MapRelative(path, _tokenizer);
+            movements = _sot2.Map(_tokenizer.Parse(path), Heading.North);
             Assert.Empty(movements);
         }
 
@@ -57,11 +60,10 @@ namespace FTurtleTests
         public void TestPathMapperAbsolute()
         {
             var path = "MMLMMLMRMLLM";
-            var start = new Position { X = 0, Y = 0, Heading = Arrow.Create(Heading.South) };
+            var start = new Position { X = 0, Y = 0, Heading = Heading.South };
 
-            var movements = _sot.MapRelative(path, _tokenizer);
-            var trace = _sot.MapAbsolute(movements, start).ToArray();
-            Assert.Equal(path.Count(c => c == 'M') + 1, trace.Length); // +1 for initialPosition
+            var trace = _sot.Map(_tokenizer.Parse(path), start).ToArray();
+            Assert.Equal(path.Count(c => c == (char)Command.Move) + 1, trace.Length); // +1 for initialPosition
 
             // Initial position
             Assert.Equal(0, trace[0].X);

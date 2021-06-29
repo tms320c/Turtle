@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using FTurtle;
+using FTurtle.Application;
 using FTurtle.Domain;
 using FTurtleTests.Tools;
 using Xunit;
@@ -9,13 +10,15 @@ using Xunit.Sdk;
 
 namespace FTurtleTests
 {
-    public class PathTokenizerTests
+    public class PathTokenizerTests : IClassFixture<PathTokenizerDefault>
     {
         private readonly ITestOutputHelper _output;
+        private readonly IPathTokenizer _defaultTokenizer;
 
-        public PathTokenizerTests(ITestOutputHelper output)
+        public PathTokenizerTests(ITestOutputHelper output, PathTokenizerDefault defaultTokenizer)
         {
             _output = output;
+            _defaultTokenizer = defaultTokenizer;
         }
 
         [Fact]
@@ -24,16 +27,14 @@ namespace FTurtleTests
             var path = PathGenerator.Create(20);
             _output.WriteLine("Path: " + path);
 
-            var tokenizer = new PathTokenizerDefault();
-
-            var tokens = tokenizer.Parse(path);
+            var tokens = _defaultTokenizer.Parse(path, null);
             Assert.True(path.Length >= tokens.Count()); // may cut L and R at the tail
 
-            var enumerable = tokens as char[] ?? tokens.ToArray();
+            var enumerable = tokens as Command[] ?? tokens.ToArray();
 
             for (var i = 0; i < enumerable.Length; ++i)
             {
-                Assert.Equal(path[i], enumerable[i]);
+                Assert.Equal(path[i], (char)enumerable[i]);
             }
         }
 
@@ -44,12 +45,30 @@ namespace FTurtleTests
             var pathTail = "LRRLLR";
             _output.WriteLine("Path: " + pathHead + pathTail);
 
-            var tokenizer = new PathTokenizerDefault();
-
-            var tokens = tokenizer.Parse(pathHead + pathTail);
+            var tokens = _defaultTokenizer.Parse(pathHead + pathTail);
             Assert.Equal(pathHead.Length, tokens.Count());
-            var enumerable = tokens as char[] ?? tokens.ToArray();
-            Assert.True(enumerable[^1] == 'M');
+            var enumerable = tokens as Command[] ?? tokens.ToArray();
+            Assert.True(enumerable[^1] == Command.Move);
+        }
+
+        [Fact]
+        public void TestPathTokenizerDefaultInvalidTokens()
+        {
+            var path = "XLMMMRLM";
+            _output.WriteLine("Path: " + path);
+
+            var tokens = _defaultTokenizer.Parse(path);
+            Assert.Equal(path.Length - 1, tokens.Count());
+            var enumerable = tokens as Command[] ?? tokens.ToArray();
+            Assert.True(enumerable[^1] == Command.Move);
+        }
+
+        [Fact]
+        public void TestPathTokenizerDefaultCustomValidator()
+        {
+            var path = "XLMMMRLM";
+            _output.WriteLine("Path: " + path);
+            _ = Assert.Throws<Exception>(() => _defaultTokenizer.Parse(path, (c) => throw new Exception()).ToArray());
         }
     }
 }
