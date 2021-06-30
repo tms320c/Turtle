@@ -7,12 +7,17 @@ using FTurtle.Domain;
 
 namespace FTurtle.Infrastructure
 {
-    public sealed class Configuration : IConfiguration
+    public sealed class StandardConfiguration : IConfiguration
     {
-        public Configuration(IBoard board, Position start, Position target, IEnumerable<string> moves)
+        public StandardConfiguration(IBoard board, Position start, Position target, IEnumerable<string> moves)
         {
             Board = board ?? throw new ArgumentNullException(nameof(board), "Board is mandatory argument");
-            Moves = moves ?? throw new ArgumentNullException(nameof(moves), "Moves is mandatory argument"); ;
+            if (moves == null)
+            {
+                throw new ArgumentNullException(nameof(moves), "Moves is mandatory argument");
+            }
+
+            Moves = new List<string>(moves.ToList()); // release the original collection
             Start = start;
             Target = target;
         }

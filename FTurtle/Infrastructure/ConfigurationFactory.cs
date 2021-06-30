@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -8,59 +9,43 @@ using System.Threading.Tasks;
 namespace FTurtle.Infrastructure
 {
     /// <summary>
-    /// Builds the configuration
+    /// Builds the configuration. Keeps the builders in "secret" and provides clients with
+    /// either building delegate, or ready configuration.
     /// </summary>
     public static class ConfigurationFactory
     {
-        private const int SizeLineNum = 0;       // The first line should define the board size.
-        private const int MinesLineNum = 1;      // The second line should contain a list of mines (i.e. list of co-ordinates separated by a space).
-        private const int TargetLineNum = 2;     // The third line of the file should contain the exit point.
-        private const int StartLineNum = 3;      // The fourth line of the file should contain the starting position of the turtle.
-        private const int MovesFirstLineNum = 4; // The fifth line to the end of the file should contain a series of moves. 
+        private static readonly ConcurrentDictionary<string, IConfigBuilder> Builders = new ConcurrentDictionary<string, IConfigBuilder>();
 
         /// <summary>
-        /// Parses raw data and creates configuration instance.
-        /// The raw data should be sanitized:
-        ///  There are no blank lines,
-        ///  There are no more than 1 space between characters
-        ///  All characters are in upper case.
+        /// Creates or reuses config builders.
+        /// It is responsibility of a builder to be thread safe and re entrant.
         /// </summary>
-        /// <param name="configType">What to create</param>
-        /// <param name="rawData">The sanitized content of the configuration file</param>
-        /// <returns></returns>
-        public static IConfiguration Create(string configType, IList<string> rawData)
+        /// <param name="kind">What to build or get</param>
+        /// <param name="creator">Delegate that creates an instance</param>
+        /// <returns>Builder delegate</returns>
+        public static Action<string> GetBuilder(string kind = "standard", Func<IConfigBuilder> creator = null)
         {
-            if (configType != "standard")
-            {
-                throw new NotImplementedException($"'{configType}' is not supported yet.");
-            }
-
-
-            var rawSize = rawData[SizeLineNum];
-
-
-            var rawMines = rawData[MinesLineNum];
-
-
-            var rawTarget = rawData[TargetLineNum];
-
-
-            var rawStart = rawData[StartLineNum];
-
-
-            var movesStartIdx = MovesFirstLineNum;
-            return null;
+            return Builders.GetOrAdd(kind, 
+                creator?.Invoke() ?? kind.ToLower() switch
+                {
+                    "standard" => new StandardConfigBuilder(),
+                    _ => ThrowIt(kind)
+                }).Build;
         }
 
-        /// <summary>
-        /// Split and converts strings like "17 42"
-        /// </summary>
-        /// <param name="raw"></param>
-        /// <returns></returns>
-        private static (int, int) ParsePairOfNumbers(string raw)
+        public static IConfiguration GetConfiguration(string kind)
         {
-            var pair = raw.Split(" ");
-            return (0, 0);
+            if (!Builders.TryGetValue(kind, out var builder))
+            {
+                throw new ArgumentException($"Configuration '{kind}' does not exists.", nameof(kind));
+            }
+
+            return builder.Get(); // may throw (e.g. if the configuration is incomplete)
+        }
+
+        private static IConfigBuilder ThrowIt(string kind)
+        {
+            throw new NotImplementedException("'{kind}' builder is not supported currently");
         }
     }
 }

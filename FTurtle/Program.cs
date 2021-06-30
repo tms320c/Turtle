@@ -69,12 +69,17 @@ namespace FTurtle
  //           string currentDirName = System.IO.Directory.GetCurrentDirectory();
         }
 
+        /// <summary>
+        /// Also verifies and sanitizes at basic level
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         private static IList<string> ReadRawConfig(TextReader file)
         {
             var data = new List<string>();
 
             // Accept digits, spaces, comma, and valid commands in either case. At least 1 per line.
-            var validator = new Regex(@"[\d\s,rRlLmMnNsSeEwW]+", RegexOptions.Compiled);
+            var validator = new Regex(@"[\d\s,RLMNSEW]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
             string rawLine;
 
@@ -89,9 +94,9 @@ namespace FTurtle
                     continue;
                 }
 
-                line = Regex.Replace(line, @"\s+", " ").ToUpper(); // multiple spaces to a single one and to uppercase
-                line = Regex.Replace(line, @",+", ","); // multiple commas to a single one
+                line = Regex.Replace(line, @"\s+", " ").ToUpper(); // multiple spaces to a single one and string to uppercase
                 line = Regex.Replace(line, @"\s*,\s*", ","); // no spaces around comma
+                line = Regex.Replace(line, @",+", ","); // multiple commas to a single one
 #if DEBUG
                 System.Console.WriteLine(line);
 #endif
