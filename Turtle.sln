@@ -7,13 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FTurtle", "FTurtle\FTurtle.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FTurtleTests", "FTurtleTests\FTurtleTests.csproj", "{20C31130-2488-4AFA-A242-38E3E07AECC9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{C41BBFC4-FF56-449C-A9D4-C435573A488C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{F059DE88-7C39-4DF2-A235-42B82FC5D360}"
-	ProjectSection(SolutionItems) = preProject
-		dotnet.yml = dotnet.yml
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,9 +24,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{F059DE88-7C39-4DF2-A235-42B82FC5D360} = {C41BBFC4-FF56-449C-A9D4-C435573A488C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13BD8448-2A99-4A96-B752-579E16341A6C}
