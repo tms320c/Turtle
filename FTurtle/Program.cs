@@ -9,6 +9,13 @@ namespace FTurtle
 {
     class Program
     {
+        /// <summary>
+        /// Main function can do something useful IMHO. Here:
+        /// It gets the file name as an argument, verifies and sanitizes it.
+        /// Then Main() reads and sanitizes the content of the file.
+        /// After that, it builds the configuration and passes control to the application "engine".
+        /// </summary>
+        /// <param name="args">arg[0] contains the trial configuration file name</param>
         static void Main(string[] args)
         {
             if (args.Length == 0)
@@ -18,6 +25,8 @@ namespace FTurtle
                 return;
             }
 
+            // Assume that file is in the local (or NFS-like) filesystem and not a URI of a remote host.
+
             var fileName = GetCleanedFileName(args[0]);
             if (fileName.Length == 0)
             {
@@ -26,7 +35,7 @@ namespace FTurtle
                 return;
             }
 
-            IList<string> rawData;
+            IList<string> rawData; // All valid lines will go here. We need an ordered collection for the line meaning is defined by it's number.
 
             try
             {
@@ -45,14 +54,19 @@ namespace FTurtle
                 return;
             }
 
-            if (rawData.Count == 0)
+            // The first line should define the board size.
+            // The second line should contain a list of mines (i.e. list of co-ordinates separated by a space).
+            // The third line of the file should contain the exit point.
+            // The fourth line of the file should contain the starting position of the turtle.
+            // The fifth line to the end of the file should contain a series of moves. 
+            if (rawData.Count < 5)
             {
-                Console.WriteLine("'{0}' does not contain any valid data.", fileName);
+                Console.WriteLine("'{0}' does not contain valid data.", fileName);
                 return;
             }
 
             
-            string currentDirName = System.IO.Directory.GetCurrentDirectory();
+ //           string currentDirName = System.IO.Directory.GetCurrentDirectory();
         }
 
         private static IList<string> ReadRawConfig(TextReader file)
@@ -60,18 +74,24 @@ namespace FTurtle
             var data = new List<string>();
 
             // Accept digits, spaces, comma, and valid commands in either case. At least 1 per line.
-            var validator = new Regex(@"[\d\s,rRlLmMnNsSeEwW]+");
+            var validator = new Regex(@"[\d\s,rRlLmMnNsSeEwW]+", RegexOptions.Compiled);
 
             string rawLine;
 
+            // line by line to handle big files.
+            // In any case, the program assumes that all valid lines can fit into RAM.
+
             while ((rawLine = file.ReadLine()) != null)
             {
-                var line = rawLine.Trim();
+                var line = rawLine.Trim().TrimEnd(',').TrimStart(',');
                 if (line.Length == 0 || !validator.IsMatch(line))
                 {
                     continue;
                 }
+
                 line = Regex.Replace(line, @"\s+", " ").ToUpper(); // multiple spaces to a single one and to uppercase
+                line = Regex.Replace(line, @",+", ","); // multiple commas to a single one
+                line = Regex.Replace(line, @"\s*,\s*", ","); // no spaces around comma
 #if DEBUG
                 System.Console.WriteLine(line);
 #endif
