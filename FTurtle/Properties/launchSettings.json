@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FTurtle": {
+      "commandName": "Project",
+      "commandLineArgs": "trial.cfg"
+    }
+  }
+}
