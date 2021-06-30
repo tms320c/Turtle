@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FTurtleTests
+namespace FTurtle.Domain
 {
-    public static class PathGenerator
+    public enum Command
     {
-        private static string[] _validTokens = {"R", "L", "M"};
-
+        Left = 'L',
+        Right = 'R',
+        Move = 'M',
+        Nop = 'X'
     }
 }
