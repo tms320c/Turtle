@@ -33,7 +33,7 @@ namespace FTurtle.Infrastructure
                 }).Build;
         }
 
-        public static IConfiguration GetConfiguration(string kind)
+        public static IConfiguration GetConfiguration(string kind = "standard")
         {
             if (!Builders.TryGetValue(kind, out var builder))
             {

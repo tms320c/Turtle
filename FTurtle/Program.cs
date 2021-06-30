@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using FTurtle.Application;
 using FTurtle.Domain;
+using FTurtle.Infrastructure;
 
 namespace FTurtle
 {
@@ -35,12 +36,13 @@ namespace FTurtle
                 return;
             }
 
-            IList<string> rawData; // All valid lines will go here. We need an ordered collection for the line meaning is defined by it's number.
-
             try
             {
+                var builder = ConfigurationFactory.GetBuilder();
                 using var file = new StreamReader(fileName);
-                rawData = ReadRawConfig(file);
+
+                ReadRawConfig(file, builder);
+
                 file.Close();
             }
             catch (NotSupportedException)
@@ -54,32 +56,34 @@ namespace FTurtle
                 return;
             }
 
-            // The first line should define the board size.
-            // The second line should contain a list of mines (i.e. list of co-ordinates separated by a space).
-            // The third line of the file should contain the exit point.
-            // The fourth line of the file should contain the starting position of the turtle.
-            // The fifth line to the end of the file should contain a series of moves. 
-            if (rawData.Count < 5)
+            IConfiguration config;
+            try
             {
-                Console.WriteLine("'{0}' does not contain valid data.", fileName);
+                config = ConfigurationFactory.GetConfiguration();
+            }
+            catch (ApplicationException ex)
+            {
+                Console.WriteLine(ex.GetType() + " " + ex.Message);
+                return;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
                 return;
             }
 
-            
- //           string currentDirName = System.IO.Directory.GetCurrentDirectory();
+            Console.WriteLine("Got config");
+
         }
 
         /// <summary>
         /// Also verifies and sanitizes at basic level
         /// </summary>
-        /// <param name="file"></param>
+        /// <param name="file">File to read</param>
+        /// <param name="builder">Data processor</param>
         /// <returns></returns>
-        private static IList<string> ReadRawConfig(TextReader file)
+        private static void ReadRawConfig(TextReader file, Action<string> builder)
         {
-            var data = new List<string>();
-
-            // Accept digits, spaces, comma, and valid commands in either case. At least 1 per line.
-            var validator = new Regex(@"[\d\s,RLMNSEW]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
             string rawLine;
 
@@ -88,22 +92,11 @@ namespace FTurtle
 
             while ((rawLine = file.ReadLine()) != null)
             {
-                var line = rawLine.Trim().TrimEnd(',').TrimStart(',');
-                if (line.Length == 0 || !validator.IsMatch(line))
-                {
-                    continue;
-                }
-
-                line = Regex.Replace(line, @"\s+", " ").ToUpper(); // multiple spaces to a single one and string to uppercase
-                line = Regex.Replace(line, @"\s*,\s*", ","); // no spaces around comma
-                line = Regex.Replace(line, @",+", ","); // multiple commas to a single one
 #if DEBUG
-                System.Console.WriteLine(line);
+                Console.WriteLine(rawLine);
 #endif
-                data.Add(line);
+                builder?.Invoke(rawLine);
             }
-
-            return data;
         }
 
         private static string GetCleanedFileName(string fileName)
