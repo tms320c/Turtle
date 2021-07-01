@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using FTurtle.Application;
 using FTurtle.Domain;
 using FTurtle.Infrastructure;
+using TurtleWorld.Core;
 using TurtleWorld.Structure;
 
 namespace FTurtle
@@ -75,6 +76,30 @@ namespace FTurtle
 
             Console.WriteLine("Got config");
 
+            // Here we can use DI to instantiate IPathMapper, IPathTokenizer, and boundary collision detection
+            // But I believe it is way too much in this case
+            var tokenizer = new PathTokenizer();
+            var mapper = new PathMapper(config.Board);
+
+            // build runner and give it simple boundary collision handling, which is clipping (one may just use null as the parameter value for this)
+            var runner = new TrialRunner(config, mapper, tokenizer, (p, b) => new Position
+            {
+                // Simple clipping strategy.
+                // The turtle stays by the boundary until a rotation command (or end of the path)
+                X = p.X >= b.Height
+                    ? b.Height - 1
+                    : (p.X < 0
+                        ? 0
+                        : p.X),
+                Y = p.Y >= b.Width
+                    ? b.Width - 1
+                    : (p.Y < 0
+                        ? 0
+                        : p.Y),
+                // Heading does not matter
+            });
+
+            runner.Run(Console.WriteLine, true);
         }
 
         /// <summary>

@@ -49,12 +49,22 @@ namespace FTurtle.Infrastructure
             {
                 var result = "Still in Danger";
 
+                ++traced;
+                if (verbose)
+                {
+                    reporter?.Invoke($"Start of movement {traced} processing");
+                }
+
                 var positions = _mapper.Map(_tokenizer.Parse(move), _config.Start, _constraint);
 
-                ++traced;
 
                 foreach (var position in positions)
                 {
+                    if (verbose)
+                    {
+                        reporter?.Invoke($"Movement {traced}: at ({position.Y}, {position.X}).");
+                    }
+
                     if (_config.Board.HasMine(position))
                     {
                         ++minesHit;
@@ -68,8 +78,13 @@ namespace FTurtle.Infrastructure
                         result = "Success";
                         break;
                     }
+
+                    if (verbose)
+                    {
+                        reporter?.Invoke($"Movement {traced}: so far so good.");
+                    }
                 }
-                
+
                 reporter?.Invoke($"Movement number {traced}: {result}");
             }
 
