@@ -8,6 +8,7 @@ using NSubstitute;
 using TurtleTests.Tools;
 using TurtleWorld.Core;
 using TurtleWorld.Structure;
+using TurtleWorld.Structure.Collision;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;

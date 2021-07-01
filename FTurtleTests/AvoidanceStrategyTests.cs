@@ -7,6 +7,7 @@ using FTurtle.Domain;
 using TurtleTests.Tools;
 using TurtleWorld.Core;
 using TurtleWorld.Entities;
+using TurtleWorld.Structure.Collision;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;

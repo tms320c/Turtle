@@ -8,6 +8,7 @@ using FTurtle.Domain;
 using FTurtle.Infrastructure;
 using TurtleWorld.Core;
 using TurtleWorld.Structure;
+using TurtleWorld.Structure.Collision;
 
 namespace FTurtle
 {

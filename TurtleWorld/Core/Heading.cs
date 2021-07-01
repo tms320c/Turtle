@@ -1,6 +1,6 @@
 ﻿namespace TurtleWorld.Core
 {
-    public ref struct Heading
+    public struct Heading
     {
         // The coordinate system:
         // X coordinate direction from North (top side) to South (bottom side)

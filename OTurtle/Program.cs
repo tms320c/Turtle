@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using FTurtle.Application;
+using OTurtle.Application;
+using OTurtle.Domain;
 using TurtleWorld.Core;
 using TurtleWorld.Structure;
+using TurtleWorld.Structure.Collision;
 
 namespace OTurtle
 {
@@ -71,12 +75,40 @@ namespace OTurtle
                 return;
             }
 
-            Console.WriteLine("Got config");
+            var startPoint = (config.Start.X, config.Start.Y);
+            var strategy = BoundaryAvoidanceFactory.Create(StrategyKind.Clip);
+            var tokenizer = new Tokenizer();
 
-            // Here we can use DI to instantiate IPathMapper, IPathTokenizer, and boundary collision detection
-            // But I believe it is way too much in this case
-            //var tokenizer = new PathTokenizer();
+            var turtle = new Turtle(startPoint, config.Start.Heading, config.Board, strategy);
 
+            foreach (var move in config.Moves)
+            {
+                var commands = tokenizer.Parse(move);
+                foreach (var command in commands)
+                {
+                    var current = turtle.Position();
+                    var position = new Position
+                    {
+                        X = current.Item1,
+                        Y = current.Item2
+                    };
+
+                    if (config.Board.HasMine(position))
+                    {
+                        Console.WriteLine("Mine Hit");
+                        break;
+                    }
+                    if (position == config.Board.Target)
+                    {
+                        Console.WriteLine("Success");
+                        break;
+                    }
+
+                    turtle.Move();
+                }
+
+                Console.WriteLine("Still in Danger");
+            }
         }
 
         /// <summary>

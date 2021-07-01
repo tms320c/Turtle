@@ -13,5 +13,5 @@ namespace OTurtle.Domain
         South = 'S',
         West = 'W'
     }
-
+    
 }

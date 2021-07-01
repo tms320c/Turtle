@@ -1,4 +1,4 @@
-﻿namespace FTurtle.Application
+﻿namespace TurtleWorld.Structure.Collision
 {
     public enum StrategyKind
     {

@@ -9,10 +9,10 @@ namespace OTurtle.Domain
 {
     public interface IMovable
     {
-        bool Move(int dx, int dy);
+        bool Move();
         bool RotateLeft();
         bool RotateRight();
-        (int, int) Position { get; }
-        Direction Direction { get; }
+        (int, int) Position();
+        (int, int) Direction();
     }
 }

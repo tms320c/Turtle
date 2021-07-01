@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using FTurtle.Infrastructure;
 using TurtleWorld.Core;
-using TurtleWorld.Structure;
 
-namespace FTurtle.Application
+namespace TurtleWorld.Structure.Collision
 {
     /// <summary>
     /// Builds the configuration. Keeps the builders in "secret" and provides clients with

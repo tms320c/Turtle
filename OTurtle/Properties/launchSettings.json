@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OTurtle": {
+      "commandName": "Project",
+      "commandLineArgs": "trial.cfg"
+    }
+  }
+}
