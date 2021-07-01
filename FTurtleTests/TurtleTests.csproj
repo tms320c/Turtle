@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FTurtle\FTurtle.csproj" />
+    <ProjectReference Include="..\TurtleWorld\TurtleWorld.csproj" />
   </ItemGroup>
 
 </Project>

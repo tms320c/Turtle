@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FTurtle.Domain;
+using TurtleWorld.Core;
 
-namespace FTurtle.Application
+namespace TurtleWorld.Entities
 {
     /// <summary>
     /// The game board. Has dimensions and has some mines implanted.

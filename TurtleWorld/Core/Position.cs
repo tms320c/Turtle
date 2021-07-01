@@ -1,4 +1,4 @@
-﻿namespace FTurtle.Domain
+﻿namespace TurtleWorld.Core
 {
     /// <summary>
     /// This is fundamental entity by itself. There is no reason to implement higher abstraction.

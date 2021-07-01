@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FTurtle", "FTurtle\FTurtle.csproj", "{2E818F9D-4FB5-402B-95AF-E809AD01048D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FTurtleTests", "FTurtleTests\FTurtleTests.csproj", "{20C31130-2488-4AFA-A242-38E3E07AECC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TurtleTests", "FTurtleTests\TurtleTests.csproj", "{20C31130-2488-4AFA-A242-38E3E07AECC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleWorld", "TurtleWorld\TurtleWorld.csproj", "{C7FDA74C-9798-4C7E-BF86-21CA8AE116B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{20C31130-2488-4AFA-A242-38E3E07AECC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20C31130-2488-4AFA-A242-38E3E07AECC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20C31130-2488-4AFA-A242-38E3E07AECC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7FDA74C-9798-4C7E-BF86-21CA8AE116B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7FDA74C-9798-4C7E-BF86-21CA8AE116B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7FDA74C-9798-4C7E-BF86-21CA8AE116B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7FDA74C-9798-4C7E-BF86-21CA8AE116B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

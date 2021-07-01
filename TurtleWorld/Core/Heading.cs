@@ -1,4 +1,4 @@
-﻿namespace FTurtle.Domain
+﻿namespace TurtleWorld.Core
 {
     public ref struct Heading
     {

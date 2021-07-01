@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using FTurtle.Application;
-using FTurtle.Application.Exceptions;
-using FTurtle.Domain;
+using TurtleWorld.Core;
+using TurtleWorld.Entities;
+using TurtleWorld.Structure.Exceptions;
 
-namespace FTurtle.Infrastructure
+namespace TurtleWorld.Structure
 {
     /// <summary>
     /// Builds simple (standard) configuration

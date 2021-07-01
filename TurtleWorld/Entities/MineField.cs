@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using FTurtle.Domain;
+using TurtleWorld.Core;
 
-namespace FTurtle.Application
+namespace TurtleWorld.Entities
 {
     /// <summary>
     /// Mines holder. Just a decorator to actual data storage which implements ISet<Position>.

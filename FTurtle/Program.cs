@@ -5,10 +5,11 @@ using System.Text.RegularExpressions;
 using FTurtle.Application;
 using FTurtle.Domain;
 using FTurtle.Infrastructure;
+using TurtleWorld.Structure;
 
 namespace FTurtle
 {
-    class Program
+    public class Program
     {
         /// <summary>
         /// Main function can do something useful IMHO. Here:

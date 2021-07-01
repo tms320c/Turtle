@@ -4,6 +4,7 @@ using FTurtle;
 using FTurtle.Application;
 using FTurtle.Domain;
 using FTurtleTests.Tools;
+using TurtleWorld.Core;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;

@@ -6,6 +6,7 @@ using FTurtle.Application;
 using FTurtle.Domain;
 using FTurtleTests.Tools;
 using NSubstitute;
+using TurtleWorld.Core;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
