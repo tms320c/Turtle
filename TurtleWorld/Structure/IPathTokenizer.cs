@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TurtleWorld.Core;
 
-namespace FTurtle.Domain
+namespace TurtleWorld.Structure
 {
     /// <summary>
     /// String to Command converters

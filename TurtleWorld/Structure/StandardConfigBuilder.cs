@@ -73,6 +73,9 @@ namespace TurtleWorld.Structure
         /// <summary>
         /// Incrementally builds the configuration.
         /// ConfigurationFactory gives this method as delegate to the configuration file reader
+        /// The builder do not throw exceptions because the exception(s) may be thrown
+        /// at configuration request if the builder has not build complete and consistent configuration.
+        /// The builder tries its best.
         /// </summary>
         /// <param name="rawLine">A line from the configuration file</param>
         public void Build(string rawLine)
@@ -83,6 +86,9 @@ namespace TurtleWorld.Structure
                 return;
             }
 
+            // The parsers expect sanitized line and non-successful completion means
+            // that the data has been seriously broken.
+            // Thus, the state machine stays at current state in hope that the correct line will be read eventually.
             var success = _currentLine switch
             {
                 SizeLineNum => ParseSize(line),

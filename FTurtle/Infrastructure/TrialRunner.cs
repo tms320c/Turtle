@@ -39,7 +39,7 @@ namespace FTurtle.Infrastructure
             });
         }
 
-        public void Run(Action<string> reporter, bool verbose = false)
+        public async Task Run(Action<string> reporter, bool verbose = false)
         {
             var traced = 0;
             var minesHit = 0;
@@ -56,7 +56,6 @@ namespace FTurtle.Infrastructure
                 }
 
                 var positions = _mapper.Map(_tokenizer.Parse(move), _config.Start, _constraint);
-
 
                 foreach (var position in positions)
                 {

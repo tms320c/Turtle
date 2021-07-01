@@ -1,10 +1,10 @@
 using System;
-using FTurtleTests.Tools;
+using TurtleTests.Tools;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace FTurtleTests
+namespace TurtleTests
 {
     public class TestToolsTests
     {

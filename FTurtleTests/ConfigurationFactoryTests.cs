@@ -5,14 +5,14 @@ using FTurtle;
 using FTurtle.Application;
 using FTurtle.Domain;
 using FTurtle.Infrastructure;
-using FTurtleTests.Tools;
+using TurtleTests.Tools;
 using TurtleWorld.Core;
 using TurtleWorld.Structure;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace FTurtleTests
+namespace TurtleTests
 {
     public class ConfigurationFactoryTests
     {

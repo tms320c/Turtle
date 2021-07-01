@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FTurtle.Domain;
 using TurtleWorld.Core;
 using TurtleWorld.Structure;
 
@@ -9,14 +8,11 @@ namespace FTurtle.Application
     /// <summary>
     /// Simple implementation of the path description tokenizer.
     /// </summary>
-    public class PathTokenizer : IPathTokenizer
+    public class Tokenizer : IPathTokenizer
     {
         public IEnumerable<Command> Parse(string path, Func<char, Command> converter = null)
         {
-            // rotations at the tail are not interesting - they do not contribute to the movement
-            char[] tokensToTrim = {(char)Command.Left, (char)Command.Right};
-
-            var tokens = path.Trim().ToUpper().TrimEnd(tokensToTrim).ToCharArray();
+            var tokens = path.Trim().ToUpper().ToCharArray();
             for (int i = 0; i < tokens.Length; ++i)
             {
                 var command = converter?.Invoke(tokens[i]) ?? DefaultConverter(tokens[i]);

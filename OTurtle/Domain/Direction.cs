@@ -4,10 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FTurtle.Infrastructure
+namespace OTurtle.Domain
 {
-    public interface ITrialRunner
+    public enum Direction
     {
-        Task Run(Action<string> reporter, bool verbose);
+        North = 'N',
+        East = 'E',
+        South = 'S',
+        West = 'W'
     }
+
 }

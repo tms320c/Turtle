@@ -3,14 +3,14 @@ using System.Linq;
 using FTurtle;
 using FTurtle.Application;
 using FTurtle.Domain;
-using FTurtleTests.Tools;
+using TurtleTests.Tools;
 using TurtleWorld.Core;
 using TurtleWorld.Entities;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace FTurtleTests
+namespace TurtleTests
 {
     public class BoardTests
     {
