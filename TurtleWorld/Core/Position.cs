@@ -9,5 +9,10 @@
         public int X { get; init; }
         public int Y { get; init; }
         public (int, int) Heading { get; init; }
+
+        // Heading is not important in comparision
+        public static bool operator ==(Position p1, Position p2) => p1.X == p2.X && p1.Y == p2.Y;
+        public static bool operator !=(Position p1, Position p2) => !(p1 == p2);
     }
+
 }

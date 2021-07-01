@@ -78,10 +78,10 @@ namespace FTurtle
         }
 
         /// <summary>
-        /// Also verifies and sanitizes at basic level
+        /// Read file line by line and delegates the job to a builder
         /// </summary>
         /// <param name="file">File to read</param>
-        /// <param name="builder">Data processor</param>
+        /// <param name="builder">Builder - the data processor</param>
         /// <returns></returns>
         private static void ReadRawConfig(TextReader file, Action<string> builder)
         {

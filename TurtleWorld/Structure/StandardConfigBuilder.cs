@@ -32,7 +32,7 @@ namespace TurtleWorld.Structure
             public IList<string> Moves;
         }
 
-        private readonly Func<int, int, IMineField, IBoard> _boardMaker;
+        private readonly Func<int, int, Position, IMineField, IBoard> _boardMaker;
         private readonly Func<IMineField> _mineFieldMaker;
 
         private Partials _partials;
@@ -58,7 +58,7 @@ namespace TurtleWorld.Structure
         /// </summary>
         /// <param name="boardMaker">Board producer delegate</param>
         /// <param name="mineFieldMaker">Mine field producer delegate</param>
-        public StandardConfigBuilder(Func<int, int, IMineField, IBoard> boardMaker, Func<IMineField> mineFieldMaker)
+        public StandardConfigBuilder(Func<int, int, Position, IMineField, IBoard> boardMaker, Func<IMineField> mineFieldMaker)
         {
             _boardMaker = boardMaker;
             _mineFieldMaker = mineFieldMaker;
@@ -123,7 +123,8 @@ namespace TurtleWorld.Structure
             }
 
             var mines = _mineFieldMaker?.Invoke() ?? new MineField();
-            var board = _boardMaker?.Invoke(_partials.BoardDimensions.Y, _partials.BoardDimensions.X, mines) ?? new Board(_partials.BoardDimensions.Y, _partials.BoardDimensions.X, mines);
+            var board = _boardMaker?.Invoke(_partials.BoardDimensions.Y, _partials.BoardDimensions.X, _partials.Target, mines) 
+                        ?? new Board(_partials.BoardDimensions.Y, _partials.BoardDimensions.X, _partials.Target, mines);
 
             foreach (var mine in _partials.Mines)
             {

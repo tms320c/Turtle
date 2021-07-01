@@ -9,6 +9,7 @@ namespace TurtleWorld.Structure
     /// </summary>
     public static class ConfigurationFactory
     {
+        // ConcurrentDictionary as a first step to multithreading; and I love GetOrAdd method.
         private static readonly ConcurrentDictionary<string, IConfigBuilder> Builders = new ConcurrentDictionary<string, IConfigBuilder>();
 
         /// <summary>

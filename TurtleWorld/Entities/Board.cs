@@ -18,8 +18,9 @@ namespace TurtleWorld.Entities
         /// </summary>
         /// <param name="width">width of the board</param>
         /// <param name="height">height of the board</param>
+        /// <param name="target">exit point - trajectory target</param>
         /// <param name="mines">Mines collection. The mines are just coordinates (Position objects)</param>
-        public Board(int width, int height, IMineField mines)
+        public Board(int width, int height, Position target, IMineField mines)
         {
             if (width <= 0)
             {
@@ -35,10 +36,28 @@ namespace TurtleWorld.Entities
 
             Width = width;
             Height = height;
+
+            if (!IsInside(target))
+            {
+                throw new ArgumentException("Exit point must be inside board.", nameof(target));
+            }
+
+            Target = target;
         }
 
         public int Width { get; }
         public int Height { get; }
+        public Position Target { get; }
+
+        public bool IsInside(Position position)
+        {
+            return IsInside(position.X, position.Y);
+        }
+
+        public bool IsInside(int x, int y)
+        {
+            return x >= 0 && x < Height && y >= 0 && y < Width;
+        }
 
         /// <summary>
         /// Validates the position and delegates the query to the mine holder.

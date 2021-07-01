@@ -8,6 +8,6 @@ namespace FTurtle.Infrastructure
 {
     public interface ITrialRunner
     {
-        void Run();
+        void Run(Action<string> reporter);
     }
 }
