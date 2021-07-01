@@ -81,9 +81,17 @@ namespace OTurtle
 
             var turtle = new Turtle(startPoint, config.Start.Heading, config.Board, strategy);
 
+            var traced = 0;
+            var minesHit = 0;
+            var targetsReached = 0;
+
             foreach (var move in config.Moves)
             {
+                var result = "Still in Danger";
+                ++traced;
+
                 var commands = tokenizer.Parse(move);
+
                 foreach (var command in commands)
                 {
                     var current = turtle.Position();
@@ -95,20 +103,37 @@ namespace OTurtle
 
                     if (config.Board.HasMine(position))
                     {
-                        Console.WriteLine("Mine Hit");
+                        result = "Mine Hit";
+                        ++minesHit;
                         break;
                     }
                     if (position == config.Board.Target)
                     {
-                        Console.WriteLine("Success");
+                        result = "Success";
+                        ++targetsReached;
                         break;
                     }
 
-                    turtle.Move();
+                    switch (command)
+                    {
+                        case Command.Left:
+                            turtle.RotateLeft();
+                            break;
+                        case Command.Right:
+                            turtle.RotateRight();
+                            break;
+                        case Command.Move:
+                            turtle.Move();
+                            break;
+                        default:
+                            continue;
+                    }
                 }
 
-                Console.WriteLine("Still in Danger");
+                Console.WriteLine(result);
             }
+
+            Console.WriteLine($"Completed {traced} movements. Mines hit: {minesHit}, exits reached: {targetsReached}");
         }
 
         /// <summary>
