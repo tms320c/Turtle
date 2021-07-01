@@ -22,6 +22,10 @@ namespace FTurtle
         /// <param name="args">arg[0] contains the trial configuration file name</param>
         static async Task Main(string[] args)
         {
+            // It could be so much better control if I use cmd line parameters, but
+            // spec prohibits any third party packages except for the unit testing
+            // and cmd line parsing would rather be a project on its own...
+            // So, I limit myself on just one parameter - configuration file name.
             if (args.Length == 0)
             {
                 Console.WriteLine("Please enter a file name.");
@@ -29,7 +33,7 @@ namespace FTurtle
                 return;
             }
 
-            // Assume that file is in the local (or NFS-like) filesystem and not a URI of a remote host.
+            // Assume that file is in the local (or NFS-like mounted) filesystem and not a URI of remote host.
 
             var fileName = SanitizeFileName(args[0]);
             if (fileName.Length == 0)
@@ -46,7 +50,9 @@ namespace FTurtle
 
                 ReadRawConfig(file, builder);
 
-                file.Close();
+                file.Close(); // to be on the safe side. 
+                // Maybe, not required because of "using" and IDisposable.
+                // Or, should it be in "finally"? But then it may run after Dispose(). Go figure...
             }
             catch (NotSupportedException)
             {
@@ -59,6 +65,8 @@ namespace FTurtle
                 return;
             }
 
+            // I open new "try" block to avoid loooong list of "catch" clauses.
+            // Plus, the possible exceptions in this block are of totally different semantic.
             IConfiguration config;
             try
             {
@@ -82,40 +90,12 @@ namespace FTurtle
 
             // build runner and give it simple boundary collision handling, which is clipping (one may just use null as the parameter value for this)
             // there are more strategies in the unit tests
-            var runner = new TrialRunner(config, mapper, tokenizer, (p, b) =>
-            {
-                // Simple clipping strategy.
-                // The turtle stays by the boundary until a rotation command (or end of the path)
-                var x = p.X;
-                var y = p.Y;
 
-                // clip X
-                if (x >= b.Height)
-                {
-                    x = b.Height - 1;
-                } else if (x < 0)
-                {
-                    x = 0;
-                }
+            var strategy = BoundaryAvoidanceFactory.Create(StrategyKind.Clip);
 
-                // clip y
-                if (y >= b.Height)
-                {
-                    y = b.Width - 1;
-                } else if (y < 0)
-                {
-                    y = 0;
-                }
+            var runner = new TrialRunner(config, mapper, tokenizer, strategy);
 
-                return new Position
-                {
-                    X = x,
-                    Y = y,
-                    // Heading does not matter
-                };
-            });
-
-            await runner.Run(Console.WriteLine, true);
+            await runner.Run(Console.WriteLine, true); // async - small step toward multi-turtle future.
         }
 
         /// <summary>
@@ -141,6 +121,12 @@ namespace FTurtle
             }
         }
 
+        /// <summary>
+        /// Never trust the user input!
+        /// Super-smart cases like "LPT1" etc will be handled later by OS.
+        /// </summary>
+        /// <param name="fileName">Name of file as user has input it</param>
+        /// <returns>File name that is closer to something that may exist in a file system. Or empty.</returns>
         private static string SanitizeFileName(string fileName)
         {
             return (new Regex($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",

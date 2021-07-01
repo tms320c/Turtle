@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FTurtle.Application;
 using FTurtle.Domain;
 using TurtleWorld.Core;
 using TurtleWorld.Structure;
@@ -21,22 +22,7 @@ namespace FTurtle.Infrastructure
             _config = config ?? throw new ArgumentNullException(nameof(config), "Configuration is mandatory");
             _mapper = pathMapper ?? throw new ArgumentNullException(nameof(pathMapper), "Path mapper is mandatory");
             _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer), "Tokenizer is mandatory");
-            _constraint = constraintHandler ?? ((p, b) => new Position
-            {
-                // Simple clipping strategy.
-                // The turtle stays by the boundary until a rotation command (or end of the path)
-                X = p.X >= b.Height
-                    ? b.Height - 1
-                    : (p.X < 0
-                        ? 0
-                        : p.X),
-                Y = p.Y >= b.Width
-                    ? b.Width - 1
-                    : (p.Y < 0
-                        ? 0
-                        : p.Y),
-                // Heading does not matter
-            });
+            _constraint = constraintHandler ?? BoundaryAvoidanceFactory.Create(StrategyKind.Clip); ;
         }
 
         public async Task Run(Action<string> reporter, bool verbose = false)

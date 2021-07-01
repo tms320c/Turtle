@@ -121,22 +121,9 @@ namespace TurtleTests
             // close to the bottom of board. Will collide with the wall on the 2nd step.
             var start = new Position { X = boardHeight - 2, Y = 0, Heading = Heading.South };
 
-            var trace = sot.Map(_tokenizer.Parse(path), start, (p, b) => new Position
-            {
-                // Simple clipping strategy.
-                // The turtle stays at the boundary until rotation command (or end of the path)
-                X = p.X >= b.Height 
-                    ? b.Height - 1 
-                    : (p.X < 0 
-                        ? 0 
-                        : p.X),
-                Y = p.Y >= b.Width 
-                    ? b.Width - 1 
-                    : (p.Y < 0 
-                        ? 0 
-                        : p.Y),
-                // Heading does not matter
-            }).ToArray();
+            var strategy = BoundaryAvoidanceFactory.Create(StrategyKind.Clip);
+
+            var trace = sot.Map(_tokenizer.Parse(path), start, strategy).ToArray();
 
             Assert.Equal(path.Count(c => c == (char)Command.Move) + 1, trace.Length); // +1 for initialPosition
             _ = _boardMock.Received().Height;
@@ -181,31 +168,9 @@ namespace TurtleTests
             // close to the bottom of board. Will collide with the wall on the 2nd step.
             var start = new Position { X = boardHeight - 2, Y = 0, Heading = Heading.South };
 
-            var trace = sot.Map(_tokenizer.Parse(path), start, (p, b) =>
-            {
-                // this strategy makes a bounce: the turtle bounces from a boundary (moves one step back) but keeps the heading
-                var h = b.Height;
-                var w = b.Width;
+            var strategy = BoundaryAvoidanceFactory.Create(StrategyKind.Bounce);
 
-                var x = p.X >= h
-                    ? p.X - 2 // may go off board for 1 row boards (will be -1 then)
-                    : (p.X < 0
-                        ? 1 // may go off board for 1 row boards (will be 1 then)
-                        : p.X);
-
-                var y = p.Y >= w
-                    ? p.Y - 2 // may go off board for 1 column boards (will be -1 then)
-                    : (p.Y < 0
-                        ? 1 // may go off board for 1 column boards (will be 1 then)
-                        : p.Y);
-
-                return new Position
-                {
-                    X = x < 0 || x >= h ? h - 1 : x, // second check, see the comments above
-                    Y = y < 0 || y >= w ? w - 1 : y
-                    // Heading does not matter
-                };
-            }).ToArray();
+            var trace = sot.Map(_tokenizer.Parse(path), start, strategy).ToArray();
 
             Assert.Equal(path.Count(c => c == (char)Command.Move) + 1, trace.Length); // +1 for initialPosition
             _ = _boardMock.Received().Height;
@@ -250,34 +215,9 @@ namespace TurtleTests
             // close to the bottom of board. Will collide with the wall on the 2nd step.
             var start = new Position { X = boardHeight - 2, Y = 0, Heading = Heading.South };
 
-            var trace = sot.Map(_tokenizer.Parse(path), start, (p, b) =>
-            {
-                // this strategy makes a turn: the turtle turns to move along the boundary maybe, because:
-                // if the next command is L or R then the heading will be changed
-                var h = b.Height;
-                var w = b.Width;
+            var strategy = BoundaryAvoidanceFactory.Create(StrategyKind.TurnLeft);
 
-                // Simple clipping at first.
-                var collisionDetected = p.X >= h || p.X < 0 || p.Y >= w || p.Y < 0;
-
-                var x = p.X >= h
-                    ? h - 1
-                    : (p.X < 0
-                        ? 0
-                        : p.X);
-                var y = p.Y >= w
-                    ? w - 1
-                    : (p.Y < 0
-                        ? 0
-                        : p.Y);
-
-                return new Position
-                {
-                    X = x,
-                    Y = y,
-                    Heading = collisionDetected ? Heading.West : Heading.Void // left turn is required if collision
-                };
-            }).ToArray();
+            var trace = sot.Map(_tokenizer.Parse(path), start, strategy).ToArray();
 
             Assert.Equal(path.Count(c => c == (char)Command.Move) + 1, trace.Length); // +1 for initialPosition
             _ = _boardMock.Received().Height;
