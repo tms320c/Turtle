@@ -154,6 +154,11 @@ namespace TurtleWorld.Structure
             _partials.BoardDimensions = new Position();
         }
 
+        /// <summary>
+        /// Convert record N M to Height Width of the board. N -> height, M -> width.
+        /// </summary>
+        /// <param name="line">string to parse</param>
+        /// <returns>true if converted</returns>
         private bool ParseSize(string line)
         {
             if (!_pairValidator.IsMatch(line))
@@ -175,13 +180,18 @@ namespace TurtleWorld.Structure
 
             _partials.BoardDimensions = new Position
             {
-                X = values.Item2,
-                Y = values.Item1
+                X = values.Item2, // board height (X-axis span)
+                Y = values.Item1  // board width (Y-axis span)
             };
 
             return true;
         }
 
+        /// <summary>
+        /// Convert record N,M to (x,y) coordinates of mine. N -> x, M -> y.
+        /// </summary>
+        /// <param name="line">string to parse</param>
+        /// <returns>true if converted</returns>
         private bool ParseMines(string line)
         {
             if (!_minesValidator.IsMatch(line))
@@ -210,14 +220,19 @@ namespace TurtleWorld.Structure
                 }
                 _partials.Mines.Add(new Position
                 {
-                    X = values.Item2,
-                    Y = values.Item1
+                    X = values.Item1,
+                    Y = values.Item2
                 });
             }
 
-            return _partials.Mines.Count > 0;
+            return _partials.Mines.Count > 0; // By spec, the mines are mandatory (config file elements are specified by its line number)
         }
 
+        /// <summary>
+        /// Convert record N M to (x,y) coordinates of exit point. N -> x, M -> y.
+        /// </summary>
+        /// <param name="line">string to parse</param>
+        /// <returns>true if converted</returns>
         private bool ParseTarget(string line)
         {
             if (!_pairValidator.IsMatch(line))
@@ -239,13 +254,18 @@ namespace TurtleWorld.Structure
 
             _partials.Target = new Position
             {
-                X = values.Item2,
-                Y = values.Item1
+                X = values.Item1,
+                Y = values.Item2
             };
 
             return true;
         }
 
+        /// <summary>
+        /// Convert record N M W to (x,y) starting point coordinates and initial heading. N -> x, M -> y, W -> heading
+        /// </summary>
+        /// <param name="line">string to parse</param>
+        /// <returns>true if converted</returns>
         private bool ParseStart(string line)
         {
             if (!_startValidator.IsMatch(line))
@@ -258,6 +278,7 @@ namespace TurtleWorld.Structure
             {
                 return false;
             }
+
             var values = ParseNumberPair(parts[0..2]);
             if (!values.Item3)
             {
@@ -279,14 +300,19 @@ namespace TurtleWorld.Structure
 
             _partials.Start = new Position
             {
-                X = values.Item2,
-                Y = values.Item1,
+                X = values.Item1,
+                Y = values.Item2,
                 Heading = heading
             };
 
             return true;
         }
 
+        /// <summary>
+        /// Convert record C1 C2 C3 to movements string C1C2C3...
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         private bool ParseMoves(string line)
         {
             if (!_movesValidator.IsMatch(line))
@@ -296,19 +322,30 @@ namespace TurtleWorld.Structure
 
             line = Regex.Replace(line, @"\s+", ""); // remove spaces
             _partials.Moves.Add(line);
+            // I do not count moves because:
+            // a) the spec can be read that the moves are not mandatory at all
+            // b) _partials.Moves is IEnumerable, so may be lazy collection and Count() may take a lot of time and CPU
             return true;
         }
 
+        /// <summary>
+        /// General two strings to to integers converter
+        /// </summary>
+        /// <param name="pair">string array to parse</param>
+        /// <returns>tuple (number1, number2, true if success)</returns>
         private (int, int, bool) ParseNumberPair(string[] pair)
         {
-            int a;
-            if (!int.TryParse(pair[0], out a))
+            if (pair.Length < 2)
             {
                 return (default, default, false);
             }
 
-            int b;
-            if (!int.TryParse(pair[1], out b))
+            if (!int.TryParse(pair[0], out var a))
+            {
+                return (default, default, false);
+            }
+
+            if (!int.TryParse(pair[1], out var b))
             {
                 return (default, default, false);
             }
@@ -316,6 +353,11 @@ namespace TurtleWorld.Structure
             return (a, b, true);
         }
 
+        /// <summary>
+        /// Sanitize input string. See the tests for the possible inputs.
+        /// </summary>
+        /// <param name="rawLine"></param>
+        /// <returns>A string that conforms to the spec, or empty string.</returns>
         private string Sanitize(string rawLine)
         {
             var line = rawLine.Trim().TrimEnd(',').TrimStart(',');
@@ -323,18 +365,27 @@ namespace TurtleWorld.Structure
             {
                 return "";
             }
+
             line = Regex.Replace(line, @"\s+", " ").ToUpper(); // multiple spaces to a single one and string to uppercase
-            line = Regex.Replace(line, @"\s*,\s*", ","); // no spaces around comma
+            line = Regex.Replace(line, @"\s*,\s*", ","); // remove spaces around commas
             line = Regex.Replace(line, @",+", ","); // multiple commas to a single one
 
             return line;
         }
 
+        /// <summary>
+        /// Simple build completion indicator. The builder has to reach to the first movements line at least.
+        /// </summary>
+        /// <returns>true if ready</returns>
         private bool IsReady()
         {
             return _currentLine > MovesFirstLineNum;
         }
 
+        /// <summary>
+        /// Configuration consistency validator. E.g. verifies that the board has reasonable (positive) dimensions.
+        /// </summary>
+        /// <returns>Empty string if the configuration is valid, error messages if not.</returns>
         private string ValidateConfiguration()
         {
             var builder = new StringBuilder();

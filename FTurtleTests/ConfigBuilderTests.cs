@@ -44,11 +44,9 @@ namespace TurtleTests
 
             var config = _sot.Get();
             
-            Assert.Equal(4, config.Target.Y);
-            Assert.Equal(2, config.Target.X);
-
-            Assert.Equal(1, config.Start.X);
-            Assert.Equal(0, config.Start.Y);
+            Assert.Equal((2,4), config.Target.Point);
+            
+            Assert.Equal((0,1), config.Start.Point);
             Assert.Equal(Heading.North, config.Start.Heading);
 
             var board = config.Board;
@@ -56,7 +54,7 @@ namespace TurtleTests
             Assert.Equal(4, board.Height);
 
             Assert.True(board.HasMine(new Position {X = 1, Y = 1}));
-            Assert.True(board.HasMine(new Position {X = 3, Y = 1}));
+            Assert.True(board.HasMine(new Position {X = 1, Y = 3}));
             Assert.True(board.HasMine(new Position {X = 3, Y = 3}));
 
             var moves = config.Moves.ToList();
@@ -87,9 +85,9 @@ namespace TurtleTests
                 new string[]
                 {
                     "5 4", // width height
-                    "1,1 1,3 3,3", // mines (Y,X)
-                    "4 2", // exit Y X
-                    "0 1 N", // start Y X heading
+                    "1,1 1,3 3,3", // mines (X,Y)
+                    "2 4", // exit X Y
+                    "0 1 N", // start X Y heading
                     "R M L M M", // path 1
                     "R M M M" // path 2
                 }
@@ -103,9 +101,9 @@ namespace TurtleTests
                     "   ",
                     "      ",
                     "   qqqq   ",
-                    ",1, 1  1 , 3  3,,3", // mines (Y,X)
-                    "4 2", // exit Y X
-                    "0   1 n", // start Y X heading
+                    ",1, 1  1 , 3  3,,3", // mines (X,Y)
+                    "2 4", // exit X Y
+                    "0   1 n", // start X Y heading
                     " r m   l M M", // path 1
                     "R M m   M " // path 2
                 }
