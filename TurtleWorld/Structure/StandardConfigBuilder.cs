@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using TurtleWorld.Core;
 using TurtleWorld.Entities;
 using TurtleWorld.Structure.Exceptions;
@@ -19,23 +20,24 @@ namespace TurtleWorld.Structure
         private const int StartLineNum = 3;      // The fourth line of the file should contain the starting position of the turtle.
         private const int MovesFirstLineNum = 4; // The fifth line to the end of the file should contain a series of moves. 
 
-        private int _currentLine = 0; // state machine
-
-        private IConfiguration _configuration;
-
-        private struct Partials
+        private class Partials
         {
+            public int CurrentLine; // state machine
             public Position BoardDimensions;
             public Position Target;
             public Position Start;
             public IList<Position> Mines;
             public IList<string> Moves;
+            public IConfiguration Configuration;
         }
 
+        // Be ready for async future
+        private readonly AsyncLocal<Partials> _partials;
+
+        // readonly fields are ok for async
         private readonly Func<int, int, Position, IMineField, IBoard> _boardMaker;
         private readonly Func<IMineField> _mineFieldMaker;
 
-        private Partials _partials;
 
         // Accept digits, spaces, comma, and valid commands in either case. At least 1 per line.
         private readonly Regex _generalValidator = new Regex(@"[\d\s,RLMNSEW]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -63,11 +65,16 @@ namespace TurtleWorld.Structure
             _boardMaker = boardMaker;
             _mineFieldMaker = mineFieldMaker;
 
-            _partials = new Partials
+            _partials = new AsyncLocal<Partials>
             {
-                Mines = new List<Position>(),
-                Moves = new List<string>()
+                Value = new Partials
+                {
+                    CurrentLine = SizeLineNum,
+                    Mines = new List<Position>(),
+                    Moves = new List<string>()
+                }
             };
+            
         }
 
         /// <summary>
@@ -89,7 +96,7 @@ namespace TurtleWorld.Structure
             // The parsers expect sanitized line and non-successful completion means
             // that the data has been seriously broken.
             // Thus, the state machine stays at current state in hope that the correct line will be read eventually.
-            var success = _currentLine switch
+            var success = _partials.Value.CurrentLine switch
             {
                 SizeLineNum => ParseSize(line),
                 MinesLineNum => ParseMines(line),
@@ -100,7 +107,7 @@ namespace TurtleWorld.Structure
 
             if (success)
             {
-                ++_currentLine; // A kind of retry if not success
+               ++_partials.Value.CurrentLine; // A kind of retry if not success
             }
 
             return;
@@ -117,9 +124,9 @@ namespace TurtleWorld.Structure
                 throw new ConfigurationNotReadyException("The configuration is incomplete");
             }
 
-            if (_configuration != null)
+            if (_partials.Value.Configuration != null)
             {
-                return _configuration;
+                return _partials.Value.Configuration;
             }
 
             string message = ValidateConfiguration();
@@ -129,29 +136,17 @@ namespace TurtleWorld.Structure
             }
 
             var mines = _mineFieldMaker?.Invoke() ?? new MineField();
-            var board = _boardMaker?.Invoke(_partials.BoardDimensions.Y, _partials.BoardDimensions.X, _partials.Target, mines) 
-                        ?? new Board(_partials.BoardDimensions.Y, _partials.BoardDimensions.X, _partials.Target, mines);
+            var board = _boardMaker?.Invoke(_partials.Value.BoardDimensions.Y, _partials.Value.BoardDimensions.X, _partials.Value.Target, mines) 
+                        ?? new Board(_partials.Value.BoardDimensions.Y, _partials.Value.BoardDimensions.X, _partials.Value.Target, mines);
 
-            foreach (var mine in _partials.Mines)
+            foreach (var mine in _partials.Value.Mines)
             {
                 board.AddMine(mine);
             }
 
-            _configuration = new StandardConfiguration(board, _partials.Start, _partials.Target, _partials.Moves);
-
-            Reset();
-
-            return _configuration;
-        }
-
-        private void Reset()
-        {
-            _currentLine = 0;
-            _partials.Mines.Clear();
-            _partials.Moves.Clear();
-            _partials.Start = new Position();
-            _partials.Target = new Position();
-            _partials.BoardDimensions = new Position();
+            _partials.Value.Configuration = new StandardConfiguration(board, _partials.Value.Start, _partials.Value.Target, _partials.Value.Moves);
+            
+            return _partials.Value.Configuration;
         }
 
         /// <summary>
@@ -178,7 +173,7 @@ namespace TurtleWorld.Structure
                 return false;
             }
 
-            _partials.BoardDimensions = new Position
+            _partials.Value.BoardDimensions = new Position
             {
                 X = values.Item2, // board height (X-axis span)
                 Y = values.Item1  // board width (Y-axis span)
@@ -218,14 +213,14 @@ namespace TurtleWorld.Structure
                 {
                     continue; // well...
                 }
-                _partials.Mines.Add(new Position
+                _partials.Value.Mines.Add(new Position
                 {
                     X = values.Item1,
                     Y = values.Item2
                 });
             }
 
-            return _partials.Mines.Count > 0; // By spec, the mines are mandatory (config file elements are specified by its line number)
+            return _partials.Value.Mines.Count > 0; // By spec, the mines are mandatory (config file elements are specified by its line number)
         }
 
         /// <summary>
@@ -252,7 +247,7 @@ namespace TurtleWorld.Structure
                 return false;
             }
 
-            _partials.Target = new Position
+            _partials.Value.Target = new Position
             {
                 X = values.Item1,
                 Y = values.Item2
@@ -298,7 +293,7 @@ namespace TurtleWorld.Structure
                 return false;
             }
 
-            _partials.Start = new Position
+            _partials.Value.Start = new Position
             {
                 X = values.Item1,
                 Y = values.Item2,
@@ -321,10 +316,8 @@ namespace TurtleWorld.Structure
             }
 
             line = Regex.Replace(line, @"\s+", ""); // remove spaces
-            _partials.Moves.Add(line);
-            // I do not count moves because:
-            // a) the spec can be read that the moves are not mandatory at all
-            // b) _partials.Moves is IEnumerable, so may be lazy collection and Count() may take a lot of time and CPU
+            _partials.Value.Moves.Add(line);
+            // I do not count moves because the spec can be read that the moves are not mandatory at all
             return true;
         }
 
@@ -379,7 +372,7 @@ namespace TurtleWorld.Structure
         /// <returns>true if ready</returns>
         private bool IsReady()
         {
-            return _currentLine > MovesFirstLineNum;
+            return _partials.Value.CurrentLine > MovesFirstLineNum;
         }
 
         /// <summary>
@@ -390,8 +383,8 @@ namespace TurtleWorld.Structure
         {
             var builder = new StringBuilder();
 
-            var height = _partials.BoardDimensions.X;
-            var width = _partials.BoardDimensions.Y;
+            var height = _partials.Value.BoardDimensions.X;
+            var width = _partials.Value.BoardDimensions.Y;
 
             if (height <= 0)
             {
@@ -404,25 +397,20 @@ namespace TurtleWorld.Structure
                 return builder.ToString();
             }
 
-            var startX = _partials.Start.X;
-            var startY = _partials.Start.Y;
+            var startX = _partials.Value.Start.X;
+            var startY = _partials.Value.Start.Y;
 
             if (!IsInside(startX, startY))
             {
                 builder.Append($"Starting position ( {startX}, {startY}) is outside of the board {width}x{height} ");
             }
 
-            var targetX = _partials.Target.X;
-            var targetY = _partials.Target.Y;
+            var targetX = _partials.Value.Target.X;
+            var targetY = _partials.Value.Target.Y;
 
             if (!IsInside(targetX, targetY))
             {
                 builder.Append($"Starting position ( {targetX}, {targetY}) is outside of the board {width}x{height} ");
-            }
-
-            if (_partials.Moves.Count == 0)
-            {
-                builder.Append("Empty moves description ");
             }
 
             return builder.ToString();
@@ -430,7 +418,7 @@ namespace TurtleWorld.Structure
 
         private bool IsInside(int x, int y)
         {
-            return x >= 0 && x < _partials.BoardDimensions.X && y >= 0 && y < _partials.BoardDimensions.Y;
+            return x >= 0 && x < _partials.Value.BoardDimensions.X && y >= 0 && y < _partials.Value.BoardDimensions.Y;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace FTurtle.Infrastructure
                 {
                     if (verbose)
                     {
-                        reporter?.Invoke($"Movement {traced}: at ({position.Y}, {position.X}).");
+                        reporter?.Invoke($"Movement {traced}: at ({position.X}, {position.Y}).");
                     }
 
                     if (_config.Board.HasMine(position))
@@ -71,7 +71,7 @@ namespace FTurtle.Infrastructure
                     }
                 }
 
-                reporter?.Invoke($"Movement number {traced}: {result}");
+                reporter?.Invoke($"Movement {traced}: {result}");
             }
 
             reporter?.Invoke($"Completed {traced} movements. Mines hit: {minesHit}, exits reached: {targetsReached}");
