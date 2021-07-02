@@ -72,14 +72,18 @@ namespace OTurtle.Application
 
         public void RotateLeft()
         {
-            _direction = _direction switch
-            {
-                (-1, 0) => Heading.West, // N to W
-                (0, -1) => Heading.South, // W to S
-                (1, 0) => Heading.East, // S to E
-                (0, 1) => Heading.North, // E to N
-                (_, _) => _direction
-            };
+            //_direction = _direction switch
+            //{
+            //    (-1, 0) => Heading.West, // N to W
+            //    (0, -1) => Heading.South, // W to S
+            //    (1, 0) => Heading.East, // S to E
+            //    (0, 1) => Heading.North, // E to N
+            //    (_, _) => _direction
+            //};
+            // Just for the code reuse. Forget the performance for a while.
+            RotateRight();
+            RotateRight();
+            RotateRight();
         }
 
         public void RotateRight()
