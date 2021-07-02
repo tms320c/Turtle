@@ -15,16 +15,26 @@ namespace OTurtle.Application
         private readonly IBoard _board;
         private (int, int) _position;
         private (int, int) _direction;
+        private readonly (int, int) _startPosition;
+        private readonly (int, int) _startDirection;
 
         public Turtle((int, int) start, (int, int) direction, IBoard board, Func<Position, IBoard, Position> collisionHandler = null)
         {
+            _startPosition = start;
+            _startDirection = direction;
             _position = start;
             _direction = direction;
             _board = board;
             _collisionHandler = collisionHandler ?? BoundaryAvoidanceFactory.Create(StrategyKind.Clip);
         }
 
-        public bool Move()
+        public void Reset()
+        {
+            _position = _startPosition;
+            _direction = _startDirection;
+        }
+
+        public Position Move()
         {
             var newPosition = _collisionHandler(
                 new Position
@@ -52,10 +62,15 @@ namespace OTurtle.Application
                 RotateRight();
             }
 
-            return true;
+            return new Position
+            {
+                X = _position.Item1,
+                Y = _position.Item2,
+                Heading = _direction
+            };
         }
 
-        public bool RotateLeft()
+        public void RotateLeft()
         {
             _direction = _direction switch
             {
@@ -65,10 +80,9 @@ namespace OTurtle.Application
                 (0, 1) => Heading.North, // E to N
                 (_, _) => _direction
             };
-            return true;
         }
 
-        public bool RotateRight()
+        public void RotateRight()
         {
             _direction = _direction switch
             {
@@ -78,12 +92,16 @@ namespace OTurtle.Application
                 (0, -1) => Heading.North, // W to N
                 (_, _) => _direction
             };
-            return true;
         }
 
-        public (int, int) Position()
+        public Position Position()
         {
-            return _position;
+            return new Position
+            {
+                X = _position.Item1,
+                Y = _position.Item2,
+                Heading = _direction
+            };
         }
 
         public (int, int) Direction()

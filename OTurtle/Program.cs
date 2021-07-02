@@ -77,63 +77,18 @@ namespace OTurtle
 
             var startPoint = (config.Start.X, config.Start.Y);
             var strategy = BoundaryAvoidanceFactory.Create(StrategyKind.Clip);
-            var tokenizer = new Tokenizer();
 
             var turtle = new Turtle(startPoint, config.Start.Heading, config.Board, strategy);
 
-            var traced = 0;
-            var minesHit = 0;
-            var targetsReached = 0;
+            var mover = new TurtleMover(turtle, config.Board, new Tokenizer());
 
+            var traced = 0;
             foreach (var move in config.Moves)
             {
-                var result = "Still in Danger";
-                ++traced;
-
-                var commands = tokenizer.Parse(move);
-
-                foreach (var command in commands)
-                {
-                    var current = turtle.Position();
-                    var position = new Position
-                    {
-                        X = current.Item1,
-                        Y = current.Item2
-                    };
-
-                    if (config.Board.HasMine(position))
-                    {
-                        result = "Mine Hit";
-                        ++minesHit;
-                        break;
-                    }
-                    if (position == config.Board.Target)
-                    {
-                        result = "Success";
-                        ++targetsReached;
-                        break;
-                    }
-
-                    switch (command)
-                    {
-                        case Command.Left:
-                            turtle.RotateLeft();
-                            break;
-                        case Command.Right:
-                            turtle.RotateRight();
-                            break;
-                        case Command.Move:
-                            turtle.Move();
-                            break;
-                        default:
-                            continue;
-                    }
-                }
-
-                Console.WriteLine(result);
+                mover.Move(++traced, move, Console.WriteLine, true);
             }
 
-            Console.WriteLine($"Completed {traced} movements. Mines hit: {minesHit}, exits reached: {targetsReached}");
+            Console.WriteLine($"Completed {traced} movements.");
         }
 
         /// <summary>
